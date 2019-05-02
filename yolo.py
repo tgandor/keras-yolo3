@@ -99,9 +99,7 @@ class YOLO(object):
                 score_threshold=self.score, iou_threshold=self.iou)
         return boxes, scores, classes
 
-    def detect_image(self, image):
-        start = timer()
-
+    def process_image(self, image):
         if self.model_image_size != (None, None):
             assert self.model_image_size[0]%32 == 0, 'Multiples of 32 required'
             assert self.model_image_size[1]%32 == 0, 'Multiples of 32 required'
@@ -116,13 +114,19 @@ class YOLO(object):
         image_data /= 255.
         image_data = np.expand_dims(image_data, 0)  # Add batch dimension.
 
-        out_boxes, out_scores, out_classes = self.sess.run(
+        return self.sess.run(
             [self.boxes, self.scores, self.classes],
             feed_dict={
                 self.yolo_model.input: image_data,
                 self.input_image_shape: [image.size[1], image.size[0]],
                 K.learning_phase(): 0
-            })
+            }
+        )
+
+    def detect_image(self, image):
+        start = timer()
+
+        out_boxes, out_scores, out_classes = self.process_image(image)
 
         print('Found {} boxes for {}'.format(len(out_boxes), 'img'))
 
@@ -188,6 +192,8 @@ def detect_video(yolo, video_path, output_path=""):
     prev_time = timer()
     while True:
         return_value, frame = vid.read()
+        if not return_value:
+            break
         image = Image.fromarray(frame)
         image = yolo.detect_image(image)
         result = np.asarray(image)

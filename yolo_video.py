@@ -61,6 +61,11 @@ if __name__ == '__main__':
         help = "[Optional] Video output path"
     )
 
+    parser.add_argument(
+        '--csv', action='store_true',
+        help='Output CSV files for images and detections'
+    )
+
     FLAGS = parser.parse_args()
 
     if FLAGS.image:
