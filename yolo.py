@@ -20,9 +20,9 @@ from keras.utils import multi_gpu_model
 
 class YOLO(object):
     _defaults = {
-        "model_path": 'model_data/yolo.h5',
-        "anchors_path": 'model_data/yolo_anchors.txt',
-        "classes_path": 'model_data/coco_classes.txt',
+        "model_path": os.path.dirname(__file__) + '/model_data/yolo.h5',
+        "anchors_path": os.path.dirname(__file__) + '/model_data/yolo_anchors.txt',
+        "classes_path": os.path.dirname(__file__) + '/model_data/coco_classes.txt',
         "score" : 0.3,
         "iou" : 0.45,
         "model_image_size" : (416, 416),
@@ -101,6 +101,7 @@ class YOLO(object):
 
     def process_image(self, image):
         if self.model_image_size != (None, None):
+            # fixed model size
             assert self.model_image_size[0]%32 == 0, 'Multiples of 32 required'
             assert self.model_image_size[1]%32 == 0, 'Multiples of 32 required'
             boxed_image = letterbox_image(image, tuple(reversed(self.model_image_size)))
@@ -130,7 +131,7 @@ class YOLO(object):
 
         print('Found {} boxes for {}'.format(len(out_boxes), 'img'))
 
-        font = ImageFont.truetype(font='font/FiraMono-Medium.otf',
+        font = ImageFont.truetype(font=os.path.dirname(__file__) + '/font/FiraMono-Medium.otf',
                     size=np.floor(3e-2 * image.size[1] + 0.5).astype('int32'))
         thickness = (image.size[0] + image.size[1]) // 300
 
@@ -175,6 +176,12 @@ class YOLO(object):
 
 def detect_video(yolo, video_path, output_path=""):
     import cv2
+
+    try:
+        video_path = int(video_path)
+    except ValueError:
+        pass
+
     vid = cv2.VideoCapture(video_path)
     if not vid.isOpened():
         raise IOError("Couldn't open webcam or video")

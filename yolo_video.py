@@ -86,18 +86,21 @@ if __name__ == "__main__":
     parser.add_argument(
         "--model",
         type=str,
+        dest='model_path',
         help="path to model weight file, default " + YOLO.get_defaults("model_path"),
     )
 
     parser.add_argument(
         "--anchors",
         type=str,
+        dest='anchors_path',
         help="path to anchor definitions, default " + YOLO.get_defaults("anchors_path"),
     )
 
     parser.add_argument(
         "--classes",
         type=str,
+        dest='classes_path',
         help="path to class definitions, default " + YOLO.get_defaults("classes_path"),
     )
 
